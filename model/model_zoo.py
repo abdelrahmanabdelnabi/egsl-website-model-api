@@ -12,6 +12,7 @@ class ResnextClassifier():
     # add a softmax layer
     if use_softmax:
       model = nn.Sequential(model, nn.Softmax(dim=1))
+    model.eval()
     self.model = model.cpu()
 
   def predict(self, video):
