@@ -1,5 +1,5 @@
 from flask import Flask, jsonify,request
-from preprocessing.utils import get_video_frames
+from preprocessing.utils import get_video_frames, StreamWrapper
 from preprocessing.transformer import ResNextTransformer
 from preprocessing.spatial_transforms import validation_spatial_transform
 import torch
@@ -8,6 +8,7 @@ import numpy as np
 from model.model_zoo import ResnextClassifier
 import os
 import matplotlib.image as mpimg
+import io
 
 app = Flask(__name__)
 
@@ -25,11 +26,9 @@ def home():
 @app.route("/predict", methods=['POST'])
 def predict():
   video = request.files['video']
-  file_path = 'video.avi'
-  video.save(file_path)
-  frames = get_video_frames(file_path)
-  if os.path.isfile(file_path):
-    os.remove(file_path)
+  stream = StreamWrapper(video.stream)
+  frames = get_video_frames(stream)
+  stream.close()
 
   transformer = ResNextTransformer(validation_spatial_transform, 64, 112)
   transformed_frames = transformer(frames)
@@ -37,7 +36,7 @@ def predict():
   predictions = np.array(model.predict(transformed_frames).squeeze())
 
   k = 5
-  top_k = np.array(predictions).argsort()[-k:][::-1]
+  top_k = np.array(predictions).argsort()[-k:][::-1] # get top-k in descending order
   res = {
     "predictions": [{
       "id": str(id),
