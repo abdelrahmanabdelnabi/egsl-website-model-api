@@ -7,7 +7,6 @@ from torchvision import transforms
 import numpy as np
 from model.model_zoo import ResnextClassifier
 import os
-import matplotlib.image as mpimg
 import io
 
 app = Flask(__name__)
