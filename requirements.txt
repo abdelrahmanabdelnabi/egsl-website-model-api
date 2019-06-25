@@ -1,0 +1,10 @@
+Flask==1.0.3
+numpy==1.16.3
+pandas==0.22.0
+pip==19.1.1
+requests==2.21.0
+setuptools==41.0.1
+torchvision==0.3.0
+tqdm==4.32.1
+Werkzeug==0.15.4
+wheel==0.33.4
