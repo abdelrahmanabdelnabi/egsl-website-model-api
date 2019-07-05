@@ -1,14 +1,27 @@
 import torch
 import torch.nn as nn
 from .resnext import resnet101
+import re
 
 class ResnextClassifier():
-  def __init__(self, weights_path, use_softmax=True):
-    self.n_classes, self.sample_size, self.sample_duration = 100, 112, 64
+  def __init__(
+    self,
+    weights_path,
+    use_softmax=True,
+    n_classes=100,
+    sample_size=112,
+    sample_duration=64
+  ):
+    self.weights_path = weights_path
+    self.n_classes, self.sample_size, self.sample_duration = n_classes, sample_size, sample_duration
     model = resnet101(sample_size=self.sample_size, sample_duration=self.sample_duration)
     model.fc = nn.Linear(model.fc.in_features, self.n_classes)
-    model.load_state_dict(torch.load(weights_path, map_location='cpu'))
-
+    data = torch.load(self.weights_path, map_location='cpu')
+    renamed_data = dict()
+    for key in data:
+        renamed_key = re.sub('^0\.', '', key)
+        renamed_data[renamed_key] = data[key]
+    model.load_state_dict(renamed_data)
     # add a softmax layer
     if use_softmax:
       model = nn.Sequential(model, nn.Softmax(dim=1))
