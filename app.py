@@ -8,15 +8,15 @@ import numpy as np
 from model.model_zoo import ResnextClassifier
 import os
 import io
+from class_names import class_names
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
-model = ResnextClassifier('best_params_100_deep_64.pth')
+model_path = os.environ['MODEL_PATH']
 
-@app.after_request
-def allow_CORS(response):
-  response.headers["Access-Control-Allow-Origin"] = "*"
-  return response
+model = ResnextClassifier(model_path, n_classes=len(class_names))
 
 @app.route("/")
 def home():
@@ -39,6 +39,7 @@ def predict():
   res = {
     "predictions": [{
       "id": str(id),
+      "word": class_names[id],
       "probability": str(prob)
       } for id, prob in zip(top_k, predictions[top_k])]
     }
