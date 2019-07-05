@@ -27,6 +27,8 @@ COPY . /home/project/app
 
 EXPOSE 6000
 
+ENV MODEL_PATH best_params_100_deep_64_arabic.pth
+
 CMD ["flask", "run", "--port=6000"]
 
 # av==6.2.0
